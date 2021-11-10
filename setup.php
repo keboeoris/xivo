@@ -33,7 +33,7 @@ define('PLUGIN_XIVO_VERSION', '1.0.0');
 // Minimal GLPI version, inclusive
 define('PLUGIN_XIVO_MIN_GLPI', '9.5');
 // Maximum GLPI version, exclusive
-define('PLUGIN_XIVO_MAX_GLPI', '9.6');
+define('PLUGIN_XIVO_MAX_GLPI', '10.0.99');
 
 // disable some feature as they are considered as experimental or deprecated by the editor
 define('PLUGIN_XIVO_ENABLE_PRESENCE', '1');
