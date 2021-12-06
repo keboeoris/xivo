@@ -389,9 +389,9 @@ class PluginXivoPhone_Line extends CommonDBRelation {
          $migration->displayMessage(sprintf(__("Installing %s"), $table));
 
          $query = "CREATE TABLE `$table` (
-                  `id`                   INT(11) NOT NULL auto_increment,
-                  `phones_id`            INT(11) NOT NULL DEFAULT 0,
-                  `lines_id` INT(11) NOT NULL DEFAULT 0,
+                  `id`                   INT NOT NULL auto_increment,
+                  `phones_id`            INT NOT NULL DEFAULT 0,
+                  `lines_id` INT NOT NULL DEFAULT 0,
                   PRIMARY KEY                 (`id`),
                   UNIQUE INDEX `unicity` (`phones_id`, `lines_id`)
                ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";

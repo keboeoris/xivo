@@ -287,14 +287,14 @@ class PluginXivoLine extends CommonDBTM {
          $migration->displayMessage(sprintf(__("Installing %s"), $table));
 
          $query = "CREATE TABLE `$table` (
-                  `id`                     INT(11) NOT NULL auto_increment,
-                  `lines_id`               INT(11) NOT NULL DEFAULT 0,
+                  `id`                     INT NOT NULL auto_increment,
+                  `lines_id`               INT NOT NULL DEFAULT 0,
                   `protocol`               VARCHAR(25) NOT NULL DEFAULT '',
                   `provisioning_extension` VARCHAR(25) NOT NULL DEFAULT '',
                   `provisioning_code`      VARCHAR(25) NOT NULL DEFAULT '',
-                  `device_slot`            INT(11) NOT NULL DEFAULT 0,
+                  `device_slot`            INT NOT NULL DEFAULT 0,
                   `contect`                VARCHAR(25) NOT NULL DEFAULT '',
-                  `position`               INT(11) NOT NULL DEFAULT 0,
+                  `position`               INT NOT NULL DEFAULT 0,
                   `registrar`              VARCHAR(50) NOT NULL DEFAULT '',
                   `xivo_line_id`           VARCHAR(255) NOT NULL DEFAULT '',
                   PRIMARY KEY        (`id`),

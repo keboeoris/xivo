@@ -348,8 +348,8 @@ class PluginXivoPhone extends CommonDBTM {
          $migration->displayMessage(sprintf(__("Installing %s"), $table));
 
          $query = "CREATE TABLE `$table` (
-                  `id`                INT(11) NOT NULL auto_increment,
-                  `phones_id`         INT(11) NOT NULL,
+                  `id`                INT NOT NULL auto_increment,
+                  `phones_id`         INT NOT NULL,
                   `xivo_id`           VARCHAR(255) NOT NULL DEFAULT '',
                   `template`          VARCHAR(255) NOT NULL DEFAULT '',
                   `date_mod`          timestamp NULL DEFAULT NULL,
