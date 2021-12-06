@@ -347,6 +347,9 @@ class PluginXivoPhone extends CommonDBTM {
       if (!$DB->tableExists($table)) {
          $migration->displayMessage(sprintf(__("Installing %s"), $table));
 
+         $default_charset = DBConnection::getDefaultCharset();
+         $default_collation = DBConnection::getDefaultCollation();
+
          $query = "CREATE TABLE `$table` (
                   `id`                INT NOT NULL auto_increment,
                   `phones_id`         INT NOT NULL,
@@ -356,7 +359,7 @@ class PluginXivoPhone extends CommonDBTM {
                   PRIMARY KEY     (`id`),
                   KEY `phones_id` (`phones_id`),
                   KEY `xivo_id`   (`xivo_id`)
-               ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
+               ) ENGINE=InnoDB  DEFAULT CHARSET={$default_charset} COLLATE={$default_collation};";
             $DB->query($query) or die ($DB->error());
       }
 
