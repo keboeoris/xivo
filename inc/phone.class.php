@@ -352,7 +352,7 @@ class PluginXivoPhone extends CommonDBTM {
                   `phones_id`         INT(11) NOT NULL,
                   `xivo_id`           VARCHAR(255) NOT NULL DEFAULT '',
                   `template`          VARCHAR(255) NOT NULL DEFAULT '',
-                  `date_mod`          DATETIME DEFAULT NULL,
+                  `date_mod`          timestamp NULL DEFAULT NULL,
                   PRIMARY KEY     (`id`),
                   KEY `phones_id` (`phones_id`),
                   KEY `xivo_id`   (`xivo_id`)
