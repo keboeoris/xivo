@@ -359,7 +359,7 @@ class PluginXivoPhone extends CommonDBTM {
                   PRIMARY KEY     (`id`),
                   KEY `phones_id` (`phones_id`),
                   KEY `xivo_id`   (`xivo_id`)
-               ) ENGINE=InnoDB  DEFAULT CHARSET={$default_charset} COLLATE={$default_collation};";
+               ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation} ROW_FORMAT=DYNAMIC;";
             $DB->query($query) or die ($DB->error());
       }
 

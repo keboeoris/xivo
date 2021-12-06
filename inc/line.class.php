@@ -302,7 +302,7 @@ class PluginXivoLine extends CommonDBTM {
                   `xivo_line_id`           VARCHAR(255) NOT NULL DEFAULT '',
                   PRIMARY KEY        (`id`),
                   KEY `lines_id`     (`lines_id`)
-               ) ENGINE=InnoDB  DEFAULT CHARSET={$default_charset} COLLATE={$default_collation};";
+               ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation} ROW_FORMAT=DYNAMIC;";
             $DB->query($query) or die ($DB->error());
       }
 

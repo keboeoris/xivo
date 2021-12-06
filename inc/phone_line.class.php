@@ -397,7 +397,7 @@ class PluginXivoPhone_Line extends CommonDBRelation {
                   `lines_id` INT NOT NULL DEFAULT 0,
                   PRIMARY KEY                 (`id`),
                   UNIQUE INDEX `unicity` (`phones_id`, `lines_id`)
-               ) ENGINE=InnoDB  DEFAULT CHARSET={$default_charset} COLLATE={$default_collation};";
+               ) ENGINE=InnoDB DEFAULT CHARSET={$default_charset} COLLATE={$default_collation} ROW_FORMAT=DYNAMIC;";
             $DB->query($query) or die ($DB->error());
       }
 
