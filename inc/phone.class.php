@@ -343,16 +343,17 @@ class PluginXivoPhone extends CommonDBTM {
    static function install(Migration $migration) {
       global $DB;
 
+      $default_charset = DBConnection::getDefaultCharset();
+      $default_collation = DBConnection::getDefaultCollation();
+      $default_key_sign = method_exists('DBConnection', 'getDefaultPrimaryKeySignOption') ? DBConnection::getDefaultPrimaryKeySignOption() : '';
+
       $table = self::getTable();
       if (!$DB->tableExists($table)) {
          $migration->displayMessage(sprintf(__("Installing %s"), $table));
 
-         $default_charset = DBConnection::getDefaultCharset();
-         $default_collation = DBConnection::getDefaultCollation();
-
          $query = "CREATE TABLE `$table` (
-                  `id`                INT NOT NULL auto_increment,
-                  `phones_id`         INT NOT NULL,
+                  `id`                INT {$default_key_sign} NOT NULL auto_increment,
+                  `phones_id`         INT {$default_key_sign} NOT NULL,
                   `xivo_id`           VARCHAR(255) NOT NULL DEFAULT '',
                   `template`          VARCHAR(255) NOT NULL DEFAULT '',
                   `date_mod`          timestamp NULL DEFAULT NULL,
