@@ -221,7 +221,7 @@ class PluginXivoConfig extends Config {
       ]);
       echo self::showField([
          'inputtype' => 'yesno',
-         'width'     => '120px',
+         'width'     => '150px',
          'label'     => __("Check certificate"),
          'attrs'     => [
             'name'  => 'api_ssl_check',
@@ -257,8 +257,9 @@ class PluginXivoConfig extends Config {
       echo self::showField([
          'inputtype' => 'dropdown',
          'itemtype'  => 'Entity',
-         'label'     => __("Default entity"),
+         'label' => __("Default entity"),
          'attrs' => [
+             'class' => 'xivo_new',
             'name'  => 'default_entity',
             'value' => $current_config['default_entity'],
          ]
@@ -438,10 +439,16 @@ class PluginXivoConfig extends Config {
 
       $out   = "";
       $width = "";
+      $xivo_class = 'xivo_field';
       if (isset($options['width'])) {
          $width = "style='width: ".$options['width']."'";
       }
-      $out.= "<div class='xivo_field' $width>";
+
+      if($options['inputtype'] == 'dropdown'){
+          $xivo_class = '';
+      }
+
+       $out.= "<div class='$xivo_class' $width>";
 
       // call the field according to its type
       switch ($options['inputtype']) {
@@ -467,11 +474,12 @@ class PluginXivoConfig extends Config {
 
          case 'dropdown':
             $options['attrs']['display'] = false;
+            $options['attrs']['class'] = 'form-select';
             $out.= Dropdown::show($options['itemtype'], $options['attrs']);
             break;
       }
 
-      $out.= "<label class='xivo_label' for='{$options['attrs']['id']}'>
+      $out.= "<label class='xivo_label form-label' for='{$options['attrs']['id']}'>
               {$options['label']}</label>";
       $out.= "</div>";
 

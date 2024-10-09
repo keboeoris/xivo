@@ -111,12 +111,16 @@ var Xuc = function() {
    };
 
    my_xuc.initAgentForm = function() {
-      $("#c_preference ul #preferences_link")
-         .after("<li id='xivo_agent'>\
-                  <a class='fa fa-phone' id='xivo_agent_button'></a>\
-                  <i class='fa fa-circle' id='xivo_agent_status'></i>\
-                  <div id='xivo_agent_form'>empty</div>\
-                </li>");
+      var searchDiv = $("form[action*='/front/search.php']").closest('div.ms-lg-auto');
+      searchDiv.after(`
+        <div class="d-flex align-items-center ms-4">
+            <li id='xivo_agent' class='list-inline-item' style='list-style: none;'>
+                <a class='fa fa-phone' id='xivo_agent_button' style='margin-right: 5px;'></a>
+                <i class='fa fa-circle' id='xivo_agent_status'></i>
+                <div id='xivo_agent_form' style='display: none;'>empty</div>
+            </li>
+        </div>
+    `);
 
       $(document)
          .on("click", "#xivo_agent_button", function() {
@@ -177,7 +181,7 @@ var Xuc = function() {
    }
 
    my_xuc.setAjaxUrl = function() {
-      plugin_ajax_url = CFG_GLPI.root_doc+"/"+GLPI_PLUGINS_PATH.mreporting+"/ajax/xuc.php";
+      plugin_ajax_url = CFG_GLPI.root_doc+"/"+GLPI_PLUGINS_PATH.xivo+"/ajax/xuc.php";
    };
 
    /**
@@ -229,7 +233,7 @@ var Xuc = function() {
             Cti.setHandler(Cti.MessageType.USERSTATUSUPDATE, my_xuc.userStatusUpdate);
             Cti.setHandler(Cti.MessageType.PHONESTATUSUPDATE, function(event) {
                if (event.status !== null) {
-                  $("#xuc_phone_status").val(event.status);
+                  $("#xuc_phone_status").text(event.status);
                }
             });
             Cti.setHandler(Cti.MessageType.USERCONFIGUPDATE, function(event) {
@@ -457,21 +461,23 @@ var Xuc = function() {
       $("#xuc_message").html("");
 
       $.when(my_xuc.loginOnXuc()).then(
-         function(data) { // doneFilter
-            bearerToken   = data.token;
-            lastState     = null;
-            lastStateDate = null;
-            my_xuc.saveXivoSession();
-            my_xuc.initConnection();
-         },
-         function(data) { //failFilter
-            if (typeof data.responseJSON.message != "undefined") {
-               $("#xuc_message")
-                  .addClass('error')
-                  .html(data.responseJSON.message);
-            }
-         });
+          function(data) { // doneFilter
+             bearerToken   = data.token;
+             lastState     = null;
+             lastStateDate = null;
+             my_xuc.saveXivoSession();
+             my_xuc.initConnection();
+          },
+          function(data) { // failFilter
+             if (typeof data.responseJSON.message != "undefined") {
+                $("#xuc_message")
+                    .addClass('alert alert-danger')
+                    .html(data.responseJSON.message);
+             }
+          }
+      );
    };
+
 
    /**
     * Logout from CTI (and reset GLPI UI)
@@ -725,9 +731,11 @@ var Xuc = function() {
     */
    my_xuc.commReleased = function() {
       $("#xivo_agent_form").hide();
-      $("#xuc_hold").hide();
       $("#xuc_call_informations").hide();
+      $(".xuc_call_actions_btn").hide();
       $("#xuc_call_actions .auto_actions").hide();
+      $("#xuc_answer").attr('display', 'none');
+      $("#xuc_hold").attr('display', 'none');
       $("#xivo_agent_button").removeClass('ringing');
       my_xuc.enableDialAction();
       callerNum = null;
@@ -745,9 +753,11 @@ var Xuc = function() {
     */
    my_xuc.showCallInformations = function(titleToShow) {
       $("#xivo_agent_form").show();
-      $("#xuc_call_titles div").hide();
+      $("th.xuc_call_titles_th").hide();
       $(titleToShow).show();
       $("#auto_actions").show();
+      $("#xuc_answer").css('display', 'inline-block');
+      $("#xuc_hold").css('display', 'inline-block');
       $("#xuc_call_actions").show();
       my_xuc.displayCallerInformations();
    };
@@ -756,8 +766,9 @@ var Xuc = function() {
     * Display transfer control (also hide dial control)
     */
    my_xuc.enableTransferAction = function() {
-      $("#dial_phone_num").hide();
+      $("#dial_phone_num_container").hide();
       $("#xuc_dial").hide();
+      $("#transfer_phone_num_container").show();
       $("#transfer_phone_num").show();
       $("#xuc_transfer").show();
    };
@@ -766,8 +777,9 @@ var Xuc = function() {
     * Display dial control (also hide transfer control)
     */
    my_xuc.enableDialAction = function() {
-      $("#dial_phone_num").show();
+      $("#dial_phone_num_container").show();
       $("#xuc_dial").show();
+      $("#transfer_phone_num_container").hide();
       $("#transfer_phone_num").hide();
       $("#xuc_transfer").hide();
    };
@@ -803,6 +815,7 @@ var Xuc = function() {
     */
    my_xuc.displayCallerInformations = function() {
       $("#xuc_call_informations").show();
+      $('.xuc_call_actions_btn').show();
       $("#xuc_caller_num").html(callerNum);
 
       // display caller information (from glpi ajax request)
@@ -855,6 +868,7 @@ var Xuc = function() {
     * @param  String target_num the to call (if not set, we will get the val of #dial_phone_num)
     */
    my_xuc.dial = function(target_num) {
+      console.log("dial");
       target_num = typeof target_num !== 'undefined'
                      ? target_num
                      : $("#dial_phone_num").val();

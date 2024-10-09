@@ -47,7 +47,7 @@
 }
 
 .xivo_field {
-   margin: 10px 0 30px 0;
+   margin: 20px 0 40px 0;
    position: relative;
    height: 20px;
    text-align: left;
@@ -67,7 +67,7 @@
 .xivo_field .xivo_input,
 .xivo_field .select2-container {
    position: absolute;
-   top: 0;
+   top: 6px;
    left: 10px;
    border-radius: 0;
    left: 0;
@@ -79,6 +79,7 @@
    background-color: transparent;
    border: 0 solid #CCC;
    border-bottom-width: 2px;
+   margin: 10px auto;
 }
 .xivo_field .select2-container {
    padding: inherit;
@@ -137,7 +138,6 @@
 
 .xivo_config_block.sub_config {
    background-color: #E8E7E7;
-   padding-bottom: 0;
    border: 0 solid #C2C2C2;
    border-width: 0 0 0 5px;
 }
@@ -199,8 +199,6 @@
    right: -100px;
    position: absolute;
    min-width: 150px;
-   background: white;
-   box-shadow: 0px 2px 2px 1px #D2CAC6;
    z-index: 50;
    padding: 0 12px 12px 12px;
 }
@@ -218,26 +216,7 @@
    width: 0;
    position: absolute;
    pointer-events: none;
-   border-color: rgba(255, 255, 255, 0);
-   border-bottom-color: #FFF;
-   border-width: 15px;
    margin-left: -15px;
-}
-
-#xivo_agent_form h2 {
-   font-size: 1.2em;
-   background: #D8D8D8;
-   padding: 3px 5px;
-   white-space: nowrap;
-}
-
-#xivo_agent_form label,
-#xivo_agent_form input {
-   display: block;
-}
-
-#xivo_agent_form input {
-   margin-bottom: 10px;
 }
 
 #xivo_agent_button {
@@ -369,10 +348,12 @@
 
 #xuc_hangup {
    color: #CB2F2F;
+   min-width: 36px!important;
 }
 
 #xuc_hold {
    display: none; /* feature doesn't work in Cti*/
+   min-width: 36px!important;
 }
 
 #xuc_answer {
@@ -391,10 +372,6 @@
    float: left;
 }
 
-#xuc_call_actions #xuc_dial {
-   color: #4CA84C;
-}
-
 #xivo_agent_form #transfer_phone_num {
    display: none;
 }
@@ -402,4 +379,37 @@
 #xuc_call_actions #xuc_transfer {
    color: #CB2F2F;
    display: none;
+}
+
+.xivo_field.dropdown_xivo .xivo_input,
+.xivo_field.dropdown_xivo .select2-container {
+   position: initial !important;
+   height: auto !important;
+}
+
+.xivo_label_dropdown{
+   top : -25px !important;
+}
+[id^="_entity"] {
+   z-index: 9999;
+   position: relative;
+   margin-bottom: 20px; /* Ajuste si nécessaire */
+}
+
+/** v10 **/
+.xivo_btns_xuc a {
+   display: block;
+   width: 30px;
+   height: 30px;
+   border: 1px solid rgba(0,0,0,.1);
+   font-size: 14px;
+   color: #252f4a;
+   text-align: center;
+   line-height: 30px;
+   margin-right: .25rem;
+   border-radius: 50%;
+}
+
+#xuc_login_form {
+   width: 220px;
 }

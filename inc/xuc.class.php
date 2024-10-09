@@ -35,103 +35,130 @@ if (!defined('GLPI_ROOT')) {
 class PluginXivoXuc {
    function getLoginForm() {
       // prepare a form for js submitting
-      $out = "<form id='xuc_login_form'>
-         <h2>".__("Connect to XIVO", 'xivo')."</h2>
-
-         <label for='xuc_username'>".__("XIVO username", 'xivo')."</label>
-         <input type='text' id='xuc_username'>
-
-         <label for='xuc_password'>".__("XIVO password", 'xivo')."</label>
-         <input type='password' id='xuc_password'>
-
-         <label for='xuc_phoneNumber'>".__("XIVO phone number", 'xivo')."</label>
-         <input type='text' id='xuc_phoneNumber' size='6'>
-
-         <input type='submit' class='submit' id='xuc_sign_in' value='".__("Connect")."'>
-
-         <div id='xuc_message'></div>
-      </form>";
-
+       $out = '<form id="xuc_login_form">
+        <div class="card">
+            <div class="card-body">
+                <fieldset class="form-fieldset">
+                    <div class="mb-3">
+                        <label for="xuc_username">'.__("XIVO username", 'xivo').'</label>
+                        <input type="text" id="xuc_username" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="xuc_password">'.__("XIVO password", 'xivo').'</label>
+                        <input type="password" id="xuc_password" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="xuc_phoneNumber">'.__("XIVO phone number", 'xivo').'</label>
+                        <input type="text" id="xuc_phoneNumber" class="form-control">
+                    </div>
+                </fieldset>
+                <div id="xuc_message"></div>
+            </div>
+            <div class="card-footer text-end">
+                <input type="submit" class="submit btn btn-primary" id="xuc_sign_in" value="'.__("Connect").'">
+            </div>
+        </div>
+        </form>';
       return $out;
    }
 
    function getLoggedForm() {
       $user = new User;
       $user->getFromDB($_SESSION['glpiID']);
-      $picture = "";
-      if (isset($user->fields['picture'])) {
-         $picture = $user->fields['picture'];
-      }
+
+       $initials = $user->getUserInitials();
+       if($initials) {
+           $avatar =  "<span class='avatar avatar-xl mb-3 rounded' style='display: flex; align-items: center; justify-content: center; background-color: #f0f0f0; color: #333; font-weight: bold; font-size: 1.5rem;'>$initials</span>";
+       }
 
       $current_config = PluginXivoConfig::getConfig();
 
       $out = "<form id='xuc_logged_form'>
-         <h2>
-            <i id='xuc_sign_out' class='fa fa-power-off pointer'></i>".
-            __("XIVO connected", 'xivo')."&nbsp;
-         </h2>
-
-         <div id='xuc_user_info'>
-            <div id='xuc_user_picture'>
-               <img src='".User::getThumbnailURLForPicture($picture)."'>
-            </div>
-            <div class='floating_text'>
-               <div id='xuc_fullname'></div>
-               <div id='xuc_statuses'>";
-      if ($current_config['enable_callcenter'] && PLUGIN_XIVO_ENABLE_CALLCENTER) {
-         $out .= "<div>
-                     <label for='xuc_user_status'>".__("User", 'xivo')."</label>
+           <div class='card'>
+           <div class='ribbon bg-red'><i id='xuc_sign_out' class='fa fa-power-off pointer'></i></div>
+                  <div class='card-body p-4 text-center'>
+                    ".$avatar."
+                    <h3 class='m-0 mb-1'><a href='#' id='xuc_fullname'>Paweł Kuna</a></h3>";
+       if ($current_config['enable_callcenter'] && PLUGIN_XIVO_ENABLE_CALLCENTER) {
+           $out .= "<div>
+                     <label for='xuc_user_status' class='form-label'>".__("User", 'xivo')."</label>
                      <select id='xuc_user_status'></select>
                   </div>";
-      }
-      $out .= "   <div>
-                     <label for='xuc_phone_status'>".__("Phone", 'xivo')."</label>
-                     <input type='text' id='xuc_phone_status' readonly>
+       }
+       $out .= "<div class='mt-3'>
+                      <span class='badge bg-success-lt'><i class='ti ti-wifi me-2'></i> ".__("XIVO connected", 'xivo')."</span><br>
+                      <p class='mt-2'><small class='text-muted'>".__("State").": </small><br>
+                      <span class='badge bg-info-lt' id='xuc_phone_status' data-bs-toggle='tooltip' title='".__("Connected user's current phone status", 'xivo')."'>{{status}}</span>
+                    </p>
+                 </div>
                   </div>
-               </div>
-            </div>
-         </div>
-      </form>
-
-      <div class='separ'></div>
-
-      <div id='xuc_call_informations'>
-         <h2 id='xuc_call_titles'>
-            <div id='xuc_ringing_title'>".__("Incoming call", 'xivo')."</div>
-            <div id='xuc_oncall_title'>".__("On call", 'xivo')."</div>
-            <div id='xuc_dialing_title'>".__("Dialing", 'xivo')."</div>
-         </h2>
-         <div class='xuc_content'>
-            <div><b>".__('Caller num:')."</b>&nbsp;<span id='xuc_caller_num'></span></div>
-            <div id='xuc_caller_infos'></div>
-
-            <div id='auto_actions'>
-               <i class='fa fa-phone-square'
-                  id='xuc_answer'
-                  title='".__("Answer", 'xivo')."'></i>
-               <i class='fa fa-phone-square fa-rotate-90'
-                  id='xuc_hangup'
-                  title='".__("Hangup", 'xivo')."'></i>
-               <i class='fa fa-pause-circle'
-                  id='xuc_hold'
-                  title='".__("Hold", 'xivo')."'></i>
-            </div>
-         </div>
-      </div>
-      <div id='xuc_call_actions'>
-         <h2>".__("Phone actions", 'xivo')."</h2>
-         <div class='xuc_content'>
-            <div class='manual_actions'>
-               <input type='text' class='input-inline' id='dial_phone_num' placeholder='".__("Dial number", 'xivo')."' />
-               <input type='text' class='input-inline' id='transfer_phone_num' placeholder='".__("Transfer to number", 'xivo')."' />
-               <i class='fa fa-phone-square'
-                  id='xuc_dial'
-                  title='".__("Dial", 'xivo')."'></i>
-               <i class='fa fa-arrow-circle-right'
-                  id='xuc_transfer'
-                  title='".__("Transfer", 'xivo')."'></i>
-            </div>
-         </div>
+                  <div class='table-responsive mb-2' id='xuc_call_informations'>
+                    <table class='table table-vcenter table-bordered table-nowrap card-table'>
+                        <tbody>
+                            <tr class='bg-light' id='xuc_call_titles'>
+                                <th class='subheader xuc_call_titles_th' colspan='4' id='xuc_ringing_title'>".__("Incoming call", 'xivo')."<span class='badge bg-primary ms-2 badge-blink'></span></th>
+                                <th class='subheader xuc_call_titles_th' colspan='4' id='xuc_oncall_title'>".__("On call", 'xivo')."<span class='badge bg-danger ms-2 badge-blink'></span></th>
+                                <th class='subheader xuc_call_titles_th' colspan='4' id='xuc_dialing_title'>".__("Dialing", 'xivo')."<span class='badge bg-info ms-2 badge-blink'></span></th>
+                            </tr>
+                            <tr>
+                                <td>".__('Caller num:', 'xivo')."</td>
+                                <td><span id='xuc_caller_num'></span></td>
+                            </tr>
+                            <tr>
+                                <td>".__('Caller infos:', 'xivo')."</td>
+                                <td><div id='xuc_caller_infos'></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                  </div>
+                  <div class='xuc_content'>
+                    <div class='manual_actions'>
+                        <div class='input-icon mb-3' id='dial_phone_num_container'>
+                                    <span class='input-icon-addon'>
+                                      <!-- Download SVG icon from http://tabler-icons.io/i/phone -->
+                                        <svg  xmlns='http://www.w3.org/2000/svg'  width='24'  height='24'  viewBox='0 0 24 24'  fill='none'  stroke='currentColor'  stroke-width='2'  stroke-linecap='round'  stroke-linejoin='round'  class='icon icon-tabler icons-tabler-outline icon-tabler-phone'><path stroke='none' d='M0 0h24v24H0z' fill='none'/><path d='M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2' /></svg>                                </span>
+                                    <input type='text' class='form-control' placeholder='".__("Dial number", 'xivo')."' id='dial_phone_num'>
+                        </div>
+                        <div class='input-icon mb-3' id='transfer_phone_num_container' style='display: none;'>
+                                    <span class='input-icon-addon'>
+                                      <!-- Download SVG icon from http://tabler-icons.io/i/phone -->
+                                        <svg  xmlns='http://www.w3.org/2000/svg'  width='24'  height='24'  viewBox='0 0 24 24'  fill='none'  stroke='currentColor'  stroke-width='2'  stroke-linecap='round'  stroke-linejoin='round'  class='icon icon-tabler icons-tabler-outline icon-tabler-phone'><path stroke='none' d='M0 0h24v24H0z' fill='none'/><path d='M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2' /></svg>                                </span>
+                                    <input type='text' class='form-control' placeholder='".__("Transfer to number", 'xivo')."' id='transfer_phone_num'>
+                        </div>
+                    </div>
+                   </div>
+                   <div id='auto_actions'>
+                    <div class='row justify-content-center'>
+                         <div class='col-auto'>
+                            <a href='#' class='xuc_call_actions_btn btn btn-x w-100 btn-icon' id='xuc_answer' data-bs-toggle='tooltip' title='".__("Answer", 'xivo')."'><!-- Download SVG icon from http://tabler-icons.io/i/pause-circle -->
+                                <svg  xmlns='http://www.w3.org/2000/svg'  width='24'  height='24'  viewBox='0 0 24 24'  fill='none'  stroke='currentColor'  stroke-width='2'  stroke-linecap='round'  stroke-linejoin='round'  class='icon icon-tabler icons-tabler-outline icon-tabler-phone-check'><path stroke='none' d='M0 0h24v24H0z' fill='none'/><path d='M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2' /><path d='M15 6l2 2l4 -4' /></svg>
+                               
+                            </a>
+                        </div>
+                        <div class='col-auto'>
+                            <a href='#' class='xuc_call_actions_btn btn btn-x w-100 btn-icon' id='xuc_hangup' data-bs-toggle='tooltip' title='".__("Hangup", 'xivo')."'><!-- Download SVG icon from http://tabler-icons.io/i/pause-circle -->
+                                <svg  xmlns='http://www.w3.org/2000/svg'  width='24'  height='24'  viewBox='0 0 24 24'  fill='none'  stroke='currentColor'  stroke-width='2'  stroke-linecap='round'  stroke-linejoin='round'  class='icon icon-tabler icons-tabler-outline icon-tabler-phone-off'><path stroke='none' d='M0 0h24v24H0z' fill='none'/><path d='M3 21l18 -18' /><path d='M5.831 14.161a15.946 15.946 0 0 1 -2.831 -8.161a2 2 0 0 1 2 -2h4l2 5l-2.5 1.5c.108 .22 .223 .435 .345 .645m1.751 2.277c.843 .84 1.822 1.544 2.904 2.078l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a15.963 15.963 0 0 1 -10.344 -4.657' /></svg>
+                                
+                            </a>
+                        </div>
+                        <div class='col-auto'>
+                            <a href='#' class='xuc_call_actions_btn btn btn-x w-100 btn-icon' id='xuc_hold' data-bs-toggle='tooltip' title='".__("Hold", 'xivo')."'><!-- Download SVG icon from http://tabler-icons.io/i/pause-circle -->
+                                <svg  xmlns='http://www.w3.org/2000/svg'  width='24'  height='24'  viewBox='0 0 24 24'  fill='none'  stroke='currentColor'  stroke-width='2'  stroke-linecap='round'  stroke-linejoin='round'  class='icon icon-tabler icons-tabler-outline icon-tabler-player-pause'><path stroke='none' d='M0 0h24v24H0z' fill='none'/><path d='M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z' /><path d='M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z' /></svg>        
+                                
+                            </a>   
+                        </div>
+                    </div>
+                  </div>
+                  <div class='d-flex' id='xuc_call_actions'>
+                  <a href='#' class='card-btn' id='xuc_transfer'><!-- Download SVG icon from http://tabler-icons.io/i/transfer -->
+                        <svg  xmlns='http://www.w3.org/2000/svg'  width='24'  height='24'  viewBox='0 0 24 24'  fill='none'  stroke='currentColor'  stroke-width='2'  stroke-linecap='round'  stroke-linejoin='round'  class='icon icon-tabler icons-tabler-outline icon-tabler-transfer'><path stroke='none' d='M0 0h24v24H0z' fill='none'/><path d='M20 10h-16l5.5 -6' /><path d='M4 14h16l-5.5 6' /></svg> 
+                              ".__("Transfer", 'xivo')."</a>
+                    <a href='#' class='card-btn' id='xuc_dial'><!-- Download SVG icon from http://tabler-icons.io/i/phone -->
+                        <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='icon me-2 text-muted'><path stroke='none' d='M0 0h24v24H0z' fill='none'></path><path d='M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2'></path></svg>
+                              ".__("Dial", 'xivo')."</a>
+                  </div>
+                </div>
+            </form>
       </div>";
 
       return $out;
